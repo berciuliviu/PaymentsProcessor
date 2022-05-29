@@ -10,15 +10,15 @@ pub enum TxType {
     Chargeback,
 }
 
-#[derive(Deserialize, Debug, Clone, Copy)]
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
 pub struct Transaction {
     #[serde(rename = "type")]
-    tx_type: TxType,
-    client: u16,
-    tx: u32,
+    pub tx_type: TxType,
+    pub client: u16,
+    pub tx: u32,
 
     #[serde(default = "default_amount")]
-    amount: f32,
+    pub amount: f32,
 }
 
 // For 3 column rows that don't have amount

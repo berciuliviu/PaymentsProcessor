@@ -19,6 +19,10 @@ fn main() {
     };
 
     let mut toy_processor: Processor = Processor::new(filename);
+
     toy_processor.process_transactions();
-    toy_processor.print_clients().unwrap();
+
+    if let Err(error) = toy_processor.print_clients() {
+        eprintln!("{}", error);
+    }
 }

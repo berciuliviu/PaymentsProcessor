@@ -16,6 +16,8 @@ lazy_static! {
         csv::ByteRecord::from(vec!["type", "client", "tx", "amount"]);
     static ref PARTIAL_HEADER: csv::ByteRecord =
         csv::ByteRecord::from(vec!["type", "client", "tx"]);
+    static ref CSV_TOP_HEADER: csv::ByteRecord =
+        csv::ByteRecord::from(vec!["client", "available", "held", "total", "locked"]);
 }
 
 /*******************************
@@ -59,7 +61,7 @@ impl Processor {
                     }
                 };
                 if let Err(error) = tx {
-                    eprintln!("Error when deserializing field: {}", error);
+                    eprintln!("Deserialization error: {}.", error);
                     continue;
                 }
 
@@ -85,12 +87,10 @@ impl Processor {
         match transaction.get_tx_type() {
             TxType::Deposit => {
                 client.consume_deposit(transaction)?;
-                client.add_transaction(transaction);
             }
 
             TxType::Withdrawal => {
                 client.consume_withdrawal(transaction)?;
-                client.add_transaction(transaction);
             }
 
             TxType::Dispute => client.consume_dispute(transaction)?,
@@ -106,8 +106,10 @@ impl Processor {
     pub fn print_clients(&self) -> Result<(), Box<dyn Error>> {
         let mut writer = csv::Writer::from_writer(std::io::stdout());
 
+        writer.write_byte_record(&CSV_TOP_HEADER)?;
+
         for (_, client) in self.clients.iter() {
-            writer.write_byte_record(&csv::ByteRecord::from(client.record()))?;
+            writer.write_byte_record(&client.record())?;
         }
 
         Ok(())
