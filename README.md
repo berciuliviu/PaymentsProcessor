@@ -51,6 +51,22 @@ cargo install
 cargo run
 ```
 
+# Tests
+
+Unit tests and integration tests are available. In order to run integration tests, make sure you have `Python` installed and run the following command:
+
+```python
+python tests/scripts/csv_generator.py
+```
+
+This script will generate a huge CSV file needed for a stress test.
+
+All tests can be run by calling:
+
+```rust
+cargo test
+```
+
 # References
 
 - [Disputes and how they work](https://stripe.com/docs/disputes#:~:text=To%20process%20a%20chargeback%2C%20the,deducted%20from%20your%20account%20balance.)

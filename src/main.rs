@@ -18,6 +18,11 @@ fn main() {
         }
     };
 
+    if !std::path::Path::new(&filename).exists() {
+        eprintln!("File {} does not exist.", filename);
+        std::process::exit(1);
+    }
+
     let mut toy_processor: Processor = Processor::new(filename);
 
     toy_processor.process_transactions();

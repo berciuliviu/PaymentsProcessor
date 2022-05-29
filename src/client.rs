@@ -522,7 +522,7 @@ mod tests {
     }
 
     #[test]
-    pub fn test_tx_errors() {
+    fn test_tx_errors() {
         let mut client: Client = Client::new(1);
         let mut deposit_transaction: Transaction = Transaction {
             tx_type: TxType::Deposit,
