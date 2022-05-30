@@ -51,9 +51,24 @@ cargo install
 cargo run
 ```
 
+# Multithreading
+
+There is a multithreading solution using Tokio on branch `tokio_threading_impl`.
+
+The following details were implemented:
+
+1. Tokio is used as the crate providing async functionalities.
+2. **Tokio::tasks** are used.
+3. There is a new structure implementation, namely ProcessorAsync, which does the following:
+4. Create a set number of channels and spawn a set number of tasks, each receiving its own channel to communicate with.
+5. Hold task handles and channels in their own containers.
+6. While parsing the CSV file, send a specific record to a specific task through its channel by using the formula `client_id % channels_length`.
+7. After all records are processed, send a Close message to each task, signaling it to print to STDOUT the client accounts and then exit.
+8. Wait for all tasks to finish.
+
 # Tests
 
-Unit tests and integration tests are available. In order to run integration tests, make sure you have `Python` installed and run the following command:
+Unit tests and integration tests are available. In order to run integration tests, make sure you have `Python` installed and run the following command from the main folder:
 
 ```python
 python tests/scripts/csv_generator.py
