@@ -1,23 +1,12 @@
-use std::collections::HashMap;
-use std::error::Error;
-
 use crate::client::Client;
 use crate::transaction::{Transaction, TxType};
+use crate::utils::*;
+use std::collections::HashMap;
+use std::error::Error;
 
 pub struct Processor {
     filename: String,
     clients: HashMap<u16, Client>,
-}
-
-// Declare const headers with lazy_static so allocation is possible at
-// runtime https://docs.rs/lazy_static/latest/lazy_static/
-lazy_static! {
-    static ref FULL_HEADER: csv::ByteRecord =
-        csv::ByteRecord::from(vec!["type", "client", "tx", "amount"]);
-    static ref PARTIAL_HEADER: csv::ByteRecord =
-        csv::ByteRecord::from(vec!["type", "client", "tx"]);
-    static ref CSV_TOP_HEADER: csv::ByteRecord =
-        csv::ByteRecord::from(vec!["client", "available", "held", "total", "locked"]);
 }
 
 /*******************************
@@ -33,21 +22,12 @@ impl Processor {
             clients: HashMap::new(),
         }
     }
+
     pub fn process_transactions(&mut self) {
         // Create Builder from file
         // - remove spaces
         // - allow different length rows
-        let mut csv_reader = csv::ReaderBuilder::new()
-            .flexible(true)
-            .trim(csv::Trim::All)
-            .from_path(&self.filename)
-            .unwrap_or_else(|err| {
-                eprintln!(
-                    "Error when trying to read from CSV: {}, {}",
-                    self.filename, err
-                );
-                std::process::exit(1);
-            });
+        let mut csv_reader: csv::Reader<std::fs::File> = create_csv_reader(&self.filename);
 
         // Deserialize each row, based on headers length
         for row in csv_reader.byte_records() {
@@ -103,10 +83,11 @@ impl Processor {
         Ok(())
     }
 
-    pub fn print_clients(&self) -> Result<(), Box<dyn Error>> {
+    pub fn print_clients(&self, header: bool) -> Result<(), Box<dyn Error>> {
         let mut writer = csv::Writer::from_writer(std::io::stdout());
-
-        writer.write_byte_record(&CSV_TOP_HEADER)?;
+        if header {
+            writer.write_byte_record(&CSV_TOP_HEADER)?;
+        }
 
         for (_, client) in self.clients.iter() {
             writer.write_byte_record(&client.record())?;

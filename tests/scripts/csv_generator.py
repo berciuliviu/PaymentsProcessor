@@ -7,3 +7,10 @@ for i in range(0,1000000):
     f.write(f"deposit,1,{i},10.001\n")
     
 f.close()
+
+f = open(f"{os.getcwd()}/tests/resources/deposit_stress_multiple_clients.csv", 'w')
+f.write("type, client, tx, amount\n")
+for i in range(0,1000000):
+    f.write(f"deposit,{i % 1000},{i},10.001\n")
+    
+f.close()
